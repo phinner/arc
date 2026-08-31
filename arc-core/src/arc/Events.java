@@ -42,7 +42,17 @@ public class Events{
 
     /** Only use this method if you have the reference to the exact listener object that was used. */
     public static <T> boolean remove(Class<T> type, Cons<T> listener){
-        return events.get(type, () -> new Seq<>(Cons.class)).remove(listener);
+        Seq<Cons<?>> listeners = events.get(type);
+        if (listeners == null){
+            return false;
+        }
+        return listeners.remove(l -> {
+            if(l instanceof ConsWithPriority<?>){
+                return ((ConsWithPriority<?>) l).cons.equals(listener);
+            }else{
+                return l.equals(listener);
+            }
+        });
     }
 
     /** Fires an enum trigger. */
