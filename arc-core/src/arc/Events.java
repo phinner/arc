@@ -40,7 +40,7 @@ public class Events{
                 .sort(comparator);
     }
 
-    /** Only use this method if you have the reference to the exact listener object that was used. */
+    /** Removes the event listener from the specified event type. */
     public static <T> boolean remove(Class<T> type, Cons<T> listener){
         Seq<Cons<?>> listeners = events.get(type);
         if (listeners == null){

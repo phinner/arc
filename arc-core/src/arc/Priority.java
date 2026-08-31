@@ -1,8 +1,6 @@
 package arc;
 
-/**
- * Utility class for ordering elements by priority.
- */
+/** Utility class for ordering elements by priority. */
 public enum Priority {
     highest,
     high,
