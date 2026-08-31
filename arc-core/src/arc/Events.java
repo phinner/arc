@@ -4,20 +4,40 @@ package arc;
 import arc.struct.Seq;
 import arc.struct.ObjectMap;
 import arc.func.Cons;
+import java.util.Comparator;
 
 /** Simple global event listener system. */
 @SuppressWarnings("unchecked")
 public class Events{
     private static final ObjectMap<Object, Seq<Cons<?>>> events = new ObjectMap<>();
+    private static final Comparator<Cons<?>> comparator = (a, b) -> {
+        Priority priorityA = a instanceof ConsWithPriority ? ((ConsWithPriority<?>)a).priority : Priority.normal;
+        Priority priorityB = b instanceof ConsWithPriority ? ((ConsWithPriority<?>)b).priority : Priority.normal;
+        return priorityA.compareTo(priorityB);
+    };
 
     /** Handle an event by class. */
     public static <T> void on(Class<T> type, Cons<T> listener){
-        events.get(type, () -> new Seq<>(Cons.class)).add(listener);
+        on(type, Priority.normal, listener);
+    }
+
+    /** Handle an event by class with the specified priority. */
+    public static <T> void on(Class<T> type, Priority priority, Cons<T> listener){
+        events.get(type, () -> new Seq<>(Cons.class))
+                .add(priority == Priority.normal ? listener : new ConsWithPriority<>(listener, priority))
+                .sort(comparator);
     }
 
     /** Handle an event by enum trigger. */
     public static void run(Object type, Runnable listener){
-        events.get(type, () -> new Seq<>(Cons.class)).add(e -> listener.run());
+        run(type, Priority.normal, listener);
+    }
+
+    /** Handle an event by enum trigger with the specified priority. */
+    public static void run(Object type, Priority priority, Runnable listener){
+        events.get(type, () -> new Seq<>(Cons.class))
+                .add(priority == Priority.normal ? e -> listener.run() : new ConsWithPriority<>(e -> listener.run(), priority))
+                .sort(comparator);
     }
 
     /** Only use this method if you have the reference to the exact listener object that was used. */
@@ -58,5 +78,20 @@ public class Events{
     /** Don't do this. */
     public static void clear(){
         events.clear();
+    }
+
+    private static final class ConsWithPriority<T> implements Cons<T>{
+        private final Cons<T> cons;
+        private final Priority priority;
+
+        private ConsWithPriority(Cons<T> cons, Priority priority){
+            this.cons = cons;
+            this.priority = priority;
+        }
+
+        @Override
+        public void get(T t) {
+            this.cons.get(t);
+        }
     }
 }
