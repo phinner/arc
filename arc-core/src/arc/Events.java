@@ -4,6 +4,7 @@ package arc;
 import arc.struct.Seq;
 import arc.struct.ObjectMap;
 import arc.func.Cons;
+import arc.util.Priority;
 import java.util.Comparator;
 
 /** Simple global event listener system. */
