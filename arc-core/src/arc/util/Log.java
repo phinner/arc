@@ -26,7 +26,7 @@ public class Log{
 
     public static void infoList(Object... args){
         StringBuilder build = new StringBuilder();
-        for (int i = 0; i < args.length; i++){
+        for(int i = 0; i < args.length; i++){
             build.append(args[i]);
             if(i + 1 < args.length) build.append(" ");
         }
