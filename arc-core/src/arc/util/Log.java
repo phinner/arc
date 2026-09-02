@@ -9,27 +9,22 @@ public class Log{
     public static LogFormatter formatter = new DefaultLogFormatter();
 
     public static void log(LogLevel level, String text, Object... args){
-        if(isLevelMoreThan(level)) return;
         logger.log(level, "", text, args);
     }
 
     public static void logTag(LogLevel level, String tag, String text, Object... args){
-        if(isLevelMoreThan(level)) return;
         logger.log(level, tag, text, args);
     }
 
     public static void debug(String text, Object... args){
-        if(isLevelMoreThan(LogLevel.debug)) return;
         logger.log(LogLevel.debug, "", text, args);
     }
     
     public static void debug(Object object){
-        if(isLevelMoreThan(LogLevel.debug)) return;
         logger.log(LogLevel.debug, "", String.valueOf(object), empty);
     }
 
     public static void infoList(Object... args){
-        if(isLevelMoreThan(LogLevel.info)) return;
         StringBuilder build = new StringBuilder();
         for (int i = 0; i < args.length; i++){
             build.append(args[i]);
@@ -39,42 +34,34 @@ public class Log{
     }
 
     public static void infoTag(String tag, String text){
-        if(isLevelMoreThan(LogLevel.info)) return;
         logger.log(LogLevel.info, tag, text, empty);
     }
 
     public static void info(String text, Object... args){
-        if(isLevelMoreThan(LogLevel.info)) return;
         logger.log(LogLevel.info, "", text, args);
     }
 
     public static void info(Object object){
-        if(isLevelMoreThan(LogLevel.info)) return;
         logger.log(LogLevel.info, "", String.valueOf(object), empty);
     }
 
     public static void warn(String text, Object... args){
-        if(isLevelMoreThan(LogLevel.warn)) return;
         logger.log(LogLevel.warn, "", text, args);
     }
 
     public static void errTag(String tag, String text){
-        if(isLevelMoreThan(LogLevel.err)) return;
         logger.log(LogLevel.err, tag, text, empty);
     }
 
     public static void err(String text, Object... args){
-        if(isLevelMoreThan(LogLevel.err)) return;
         logger.log(LogLevel.err, "", text, args);
     }
 
     public static void err(Throwable th){
-        if(Log.level.ordinal() > LogLevel.err.ordinal()) return;
         logger.log(LogLevel.err, "", "", th);
     }
 
     public static void err(String text, Throwable th){
-        if(Log.level.ordinal() > LogLevel.err.ordinal()) return;
         logger.log(LogLevel.err, "", text, th);
     }
 
@@ -98,10 +85,6 @@ public class Log{
             text = text.replace("&" + ColorCodes.codes[i], ColorCodes.values[i]);
         }
         return text;
-    }
-
-    private static boolean isLevelMoreThan(LogLevel level){
-        return Log.level.ordinal() > level.ordinal();
     }
 
     public enum LogLevel{
@@ -128,11 +111,13 @@ public class Log{
         void log(LogLevel level, String text);
 
         default void log(LogLevel level, String tag, String text, Throwable th){
+            if(Log.level.ordinal() > level.ordinal()) return;
             text = text + (text.isEmpty() ? "" : ": ") + Strings.getStackTrace(th);
             this.log(level, (tag.isEmpty() ? "" : "[" + tag + "] ") + format(text, empty));
         }
 
         default void log(LogLevel level, String tag, String text, Object... args){
+            if(Log.level.ordinal() > level.ordinal()) return;
             this.log(level, (tag.isEmpty() ? "" : "[" + tag + "] ") + format(text, args));
         }
     }
