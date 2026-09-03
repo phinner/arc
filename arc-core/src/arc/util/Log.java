@@ -112,7 +112,7 @@ public class Log{
 
         default void log(LogLevel level, String tag, String text, Throwable th){
             if(Log.level.ordinal() > level.ordinal()) return;
-            text = text + (text.isEmpty() ? "" : ": ") + Strings.getStackTrace(th);
+            text += (text.isEmpty() ? "" : ": ") + Strings.getStackTrace(th);
             this.log(level, (tag.isEmpty() ? "" : "[" + tag + "] ") + format(text, empty));
         }
 
