@@ -9,19 +9,19 @@ public class Log{
     public static LogFormatter formatter = new DefaultLogFormatter();
 
     public static void log(LogLevel level, String text, Object... args){
-        logger.log(level, "", "", text, args);
+        logger.log(level, "", text, args);
     }
 
     public static void logTag(LogLevel level, String tag, String text, Object... args){
-        logger.log(level, tag, "", text, args);
+        logger.log(level, tag, text, args);
     }
 
     public static void debug(String text, Object... args){
-        logger.log(LogLevel.debug, "", "", text, args);
+        logger.log(LogLevel.debug, "", text, args);
     }
     
     public static void debug(Object object){
-        logger.log(LogLevel.debug, "", "", String.valueOf(object), empty);
+        logger.log(LogLevel.debug, "", String.valueOf(object), empty);
     }
 
     public static void infoList(Object... args){
@@ -30,39 +30,39 @@ public class Log{
             build.append(args[i]);
             if(i + 1 < args.length) build.append(" ");
         }
-        logger.log(LogLevel.info, "", "", build.toString(), empty);
+        logger.log(LogLevel.info, "", build.toString(), empty);
     }
 
     public static void infoTag(String tag, String text){
-        logger.log(LogLevel.info, tag, "", text, empty);
+        logger.log(LogLevel.info, tag, text, empty);
     }
 
     public static void info(String text, Object... args){
-        logger.log(LogLevel.info, "", "", text, args);
+        logger.log(LogLevel.info, "", text, args);
     }
 
     public static void info(Object object){
-        logger.log(LogLevel.info, "", "", String.valueOf(object), empty);
+        logger.log(LogLevel.info, "", String.valueOf(object), empty);
     }
 
     public static void warn(String text, Object... args){
-        logger.log(LogLevel.warn, "", "", text, args);
+        logger.log(LogLevel.warn, "", text, args);
     }
 
     public static void errTag(String tag, String text){
-        logger.log(LogLevel.err, tag, "", text, empty);
+        logger.log(LogLevel.err, tag, text, empty);
     }
 
     public static void err(String text, Object... args){
-        logger.log(LogLevel.err, "", "", text, args);
+        logger.log(LogLevel.err, "", text, args);
     }
 
     public static void err(Throwable th){
-        logger.log(LogLevel.err, "", "", "", th);
+        logger.log(LogLevel.err, "", "", th);
     }
 
     public static void err(String text, Throwable th){
-        logger.log(LogLevel.err, "", "", text, th);
+        logger.log(LogLevel.err, "", text, th);
     }
 
     public static String format(String text, Object... args){
@@ -85,10 +85,6 @@ public class Log{
             text = text.replace("&" + ColorCodes.codes[i], ColorCodes.values[i]);
         }
         return text;
-    }
-
-    private static String tagOrEmpty(final String value){
-        return value.isEmpty() ? "" : "[" + value + "] ";
     }
 
     public enum LogLevel{
@@ -114,15 +110,15 @@ public class Log{
     public interface LogHandler{
         void log(LogLevel level, String text);
 
-        default void log(LogLevel level, String tag, String topic, String text, Throwable th){
+        default void log(LogLevel level, String tag, String text, Throwable th){
             if(Log.level.ordinal() > level.ordinal()) return;
             text = text + (text.isEmpty() ? "" : ": ") + Strings.getStackTrace(th);
-            this.log(level, tagOrEmpty(tag) + tagOrEmpty(topic) + format(text, empty));
+            this.log(level, (tag.isEmpty() ? "" : "[" + tag + "] ") + format(text, empty));
         }
 
-        default void log(LogLevel level, String tag, String topic, String text, Object... args){
+        default void log(LogLevel level, String tag, String text, Object... args){
             if(Log.level.ordinal() > level.ordinal()) return;
-            this.log(level, tagOrEmpty(tag) + tagOrEmpty(topic) + format(text, args));
+            this.log(level, (tag.isEmpty() ? "" : "[" + tag + "] ") + format(text, args));
         }
     }
 
@@ -140,7 +136,7 @@ public class Log{
 
     public static class NoopLogHandler implements LogHandler{
         @Override public void log(LogLevel level, String text){}
-        @Override public void log(LogLevel level, String tag, String topic, String text, Throwable th){}
-        @Override public void log(LogLevel level, String tag, String topic, String text, Object... args){}
+        @Override public void log(LogLevel level, String tag, String text, Throwable th){}
+        @Override public void log(LogLevel level, String tag, String text, Object... args){}
     }
 }
